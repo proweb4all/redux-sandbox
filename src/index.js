@@ -1,14 +1,49 @@
-const reducer = (state = 0, action) => {
-    switch (action.type) {
-        case 'INC':
-            return ++state;
-        default:
-            return state;
-    }
-}
+import { createStore } from 'redux';
+import reducer from './reducer';
+import { inc, dec, rnd } from './actions';
 
-let state = reducer(undefined, {});
-state = reducer(state, { type: 'INC' });
-console.log(state);
-state = reducer(state, { type: 'INC' });
-console.log(state);
+const store = createStore(reducer);
+const { dispatch } = store;
+const bindActionCreator = (creator, dispatch) => (...args) => {
+    dispatch(creator(...args));
+};
+
+const incDispatch = bindActionCreator(inc, dispatch);
+const decDispatch = bindActionCreator(dec, dispatch);
+const rndDispatch = bindActionCreator(rnd, dispatch);
+
+document
+    .getElementById('inc')
+    .addEventListener('click', incDispatch);
+document
+    .getElementById('dec')
+    .addEventListener('click', decDispatch);
+document
+    .getElementById('rnd')
+    .addEventListener('click', () => {
+        const payload = Math.floor(Math.random()*10);
+        rndDispatch(payload);
+    });
+
+const update = () => {
+    document
+        .getElementById('counter')
+        .textContent = store.getState();
+};
+
+store.subscribe(update);
+
+
+// store.subscribe(() => {
+//     console.log(store.getState());
+// });
+// store.dispatch({type: 'INC'});
+// store.dispatch({type: 'INC'});
+
+
+
+// let state = reducer(undefined, {});
+// state = reducer(state, { type: 'INC' });
+// console.log(state);
+// state = reducer(state, { type: 'INC' });
+// console.log(state);
